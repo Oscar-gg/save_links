@@ -127,7 +127,7 @@ def append_links(class_name):
     text_file.close()
 
 
-# Function that checks if the arguments are good.
+# Function that checks if the arguments are correct.
 def check_args(list):
     if list[1] == 'help':
         return help_function()
@@ -138,26 +138,33 @@ def check_args(list):
     if len(list) != 3:
         print('Error:', str(len(list)), 'arguments introduced.')
         return 2
-    if list[1] != 'save' and list[1] != 'append' and list[1] != 'open':
+    if list[1] != 'save' and list[1] != 'append' and list[1] != 'open' \
+            and list[1] != 'delete':
         print('Error:', list[1], 'is not a valid argument.')
         return 4
     return 0
 
 
-# Help section that can display all the information related to keywords and stuff.
+# Help section that displays information related to keywords and general use.
 def help_function():
     print('Program made by Oscar Arreola\n')
-    print('The purpose of this program is to store the links of an opened window and'
+    print('The purpose of this program is to store the links of an opened window in order to'
           ' open them when indicated through the arguments.')
     print('Only works for chrome and, in case you want to save the links of a window, it should be opened'
           ' and visible.')
-    print('The arguments are received from the run dialog.\n')
-    print("WARNING: If the terminal blocks the plus sign of the chrome window, the program won't work.")
+    print('The arguments are received from the run dialog or the command line.\n')
+    print("WARNING: If the terminal blocks the plus sign of the chrome window, the script won't work.")
     print('The format expected for the arguments is the following:')
     print("name.py open/save/append/options/help/show className", end='\n\n')
     print('If there are more or less arguments, the program will throw an error.')
     print('The save method erases the previous stored links.', end="\n\n")
     return 1
+
+# Shows the available options to open or delete.
+
+def show_options():
+
+    return 0
 
 
 # Main thread
