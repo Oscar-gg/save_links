@@ -126,6 +126,8 @@ def append_links(class_name):
     shelve_file.close()
     text_file.close()
 
+def delete_links(class_name):
+    return 0
 
 # Function that checks if the arguments are correct.
 def check_args(list):
@@ -167,8 +169,27 @@ def show_options():
     return 0
 
 
+
+
+def setup():
+    """Creates the folders used by the program for the first time.
+
+    """
+    if not os.path.isdir('Save Links'):
+        os.mkdir('Save Links')  # Folder that contains files used by the script.
+    if not os.path.isdir('Save Links\\Images'):
+        os.mkdir('Save Links\\Images')  # Folder to save images of plus signs.
+    if not os.path.isdir('Save Links\\Class Links'):
+        os.mkdir('Save Links\\Class Links')  # Contains the files with links.
+    if not os.path.isdir('Save Links\\Class Links\\Shelve'):
+        os.mkdir('Save Links\\Class Links\\Shelve')  # Shelve files with links.
+    if not os.path.isdir('Save Links\\Class Links\\Plain Text'):
+        os.mkdir('Save Links\\Class Links\\Plain Text')  # Plain files w/links.
+
+
 # Main thread
 # Format: name.py open/save/append className
+setup()
 
 argument_list = sys.argv
 
@@ -182,7 +203,7 @@ if status == 1:
 elif status == 2:
     sys.exit('Program aborted, incorrect amount of arguments.')
 elif status == 3:
-    os.chdir(r'C:\Users\oscar\PythonProjects\Save Links\Class Links\Shelve')
+    os.chdir(r'Save Links\Class Links\Shelve')
     shelve_file = shelve.open('Links de Clases')
     print('Available options:\n')
     for key in list(shelve_file.keys()):
@@ -191,7 +212,7 @@ elif status == 3:
     print('\n')
     sys.exit("Program aborted, options displayed.\n")
 elif status == 5:
-    os.chdir(r'C:\Users\oscar\PythonProjects\Save Links\Class Links\Shelve')
+    os.chdir(r'Save Links\Class Links\Shelve')
     shelve_file = shelve.open('Links de Clases')
     for key in list(shelve_file.keys()):
         print('Clase:', key)
@@ -213,3 +234,5 @@ elif argument_list[1] == 'open':
     open_links(argument_list[2])
 elif argument_list[1] == 'append':
     append_links(argument_list[2])
+elif argument_list[1] == 'delete':
+    delete_links(argument_list[2])
