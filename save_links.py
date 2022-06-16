@@ -131,8 +131,12 @@ def delete_links(class_name):
     return 0
 
 
-# Function that checks if the arguments are correct.
 def check_args(list):
+    """Function that checks if the arguments are correct.
+
+    :param list:list of arguments retrieved from command line.
+    :return: status code interpreted by main thread.
+    """
     if list[1] == 'help':
         return help_function()
     if list[1] == 'options':
@@ -246,3 +250,4 @@ elif argument_list[1] == 'append':
     append_links(argument_list[2])
 elif argument_list[1] == 'delete':
     delete_links(argument_list[2])
+    
