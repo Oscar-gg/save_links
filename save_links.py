@@ -15,10 +15,10 @@ import webbrowser
 
 # Function that saves the links of the open window.
 def save_links(class_name):
-    os.chdir(r'C:\Users\oscar\PythonProjects\Save Links')
+    os.chdir(r'Save Links')
     shelve_file = shelve.open(r'Class Links\Shelve\Links de Clases')
     text_file = open('Class Links\\Plain Text\\' + class_name + '.txt', 'w')
-    selectw()
+    select_window()
     links = get_links()
     shelve_file[class_name] = links
     for link in links:
@@ -28,7 +28,7 @@ def save_links(class_name):
 
 
 # Function that selects and maximizes the corresponding window.
-def selectw():
+def select_window():
     a = 0
     try:
         location = pyautogui.locateCenterOnScreen(r'Images\plus.png')
@@ -94,7 +94,7 @@ def get_links():
 
 # Function that opens the links
 def open_links(class_name):
-    os.chdir(r'C:\Users\oscar\PythonProjects\Save Links\Class Links\Shelve')
+    os.chdir(r'Save Links\Class Links\Shelve')
     shelve_retrieve = shelve.open('Links de Clases')
     if class_name not in list(shelve_retrieve.keys()):
         shelve_retrieve.close()
@@ -110,14 +110,14 @@ def open_links(class_name):
 
 # Function that appends the links
 def append_links(class_name):
-    os.chdir(r'C:\Users\oscar\PythonProjects\Save Links')
+    os.chdir(r'Save Links')
     shelve_file = shelve.open(r'Class Links\Shelve\Links de Clases')
     if class_name not in list(shelve_file.keys()):
         shelve_file.close()
         sys.exit("Error: class name doesn't exist.")
     text_file = open('Class Links\\Plain Text\\' + class_name + '.txt', 'a')
     temp_list = shelve_file[class_name]
-    selectw()
+    select_window()
     to_append = get_links()
     for link in to_append:
         temp_list.append(link)
@@ -126,8 +126,10 @@ def append_links(class_name):
     shelve_file.close()
     text_file.close()
 
+
 def delete_links(class_name):
     return 0
+
 
 # Function that checks if the arguments are correct.
 def check_args(list):
@@ -157,18 +159,42 @@ def help_function():
     print('The arguments are received from the run dialog or the command line.\n')
     print("WARNING: If the terminal blocks the plus sign of the chrome window, the script won't work.")
     print('The format expected for the arguments is the following:')
-    print("name.py open/save/append/options/help/show className", end='\n\n')
+    print("name.py open/save/append/options/help/show/delete className", end='\n\n')
     print('If there are more or less arguments, the program will throw an error.')
+    # TODO: explain what each command does.
     print('The save method erases the previous stored links.', end="\n\n")
     return 1
 
+
 # Shows the available options to open or delete.
-
 def show_options():
-
+    os.chdir(r'Save Links\Class Links\Shelve')
+    shelve_file = shelve.open('Links de Clases')
+    print('Available options:\n')
+    for key in list(shelve_file.keys()):
+        print(key)
+    shelve_file.close()
+    print('\n')
     return 0
 
 
+def show_detailed_options():
+    os.chdir(r'Save Links\Class Links\Shelve')
+    shelve_file = shelve.open('Links de Clases')
+    for key in list(shelve_file.keys()):
+        print('Clase:', key)
+        for link in shelve_file[key]:
+            print(link)
+        print('\n')
+    shelve_file.close()
+
+
+def dramatic_close_message():
+    print('Invalid argument introduced.')
+    print('Program closing in ', end='')
+    for x in range(5, 0, -1):
+        print(x, end=' ', flush=True)
+        time.sleep(1)
 
 
 def setup():
@@ -188,7 +214,7 @@ def setup():
 
 
 # Main thread
-# Format: name.py open/save/append className
+# Format: name.py open/save/append/options/help/show/delete className
 setup()
 
 argument_list = sys.argv
@@ -203,29 +229,13 @@ if status == 1:
 elif status == 2:
     sys.exit('Program aborted, incorrect amount of arguments.')
 elif status == 3:
-    os.chdir(r'Save Links\Class Links\Shelve')
-    shelve_file = shelve.open('Links de Clases')
-    print('Available options:\n')
-    for key in list(shelve_file.keys()):
-        print(key)
-    shelve_file.close()
-    print('\n')
+    show_options()
     sys.exit("Program aborted, options displayed.\n")
 elif status == 5:
-    os.chdir(r'Save Links\Class Links\Shelve')
-    shelve_file = shelve.open('Links de Clases')
-    for key in list(shelve_file.keys()):
-        print('Clase:', key)
-        for link in shelve_file[key]:
-            print(link)
-        print('\n')
-    shelve_file.close()
+    show_detailed_options()
+    sys.exit("Program aborted, detailed options displayed.\n")
 elif status == 4:
-    print('Invalid argument introduced.')
-    print('Program closing in ', end='')
-    for x in range(5, 0, -1):
-        print(x, end=' ')
-        time.sleep(1)
+    dramatic_close_message()
     sys.exit('\n\nProgram aborted.')
 
 if argument_list[1] == 'save':
