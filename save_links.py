@@ -26,7 +26,7 @@ def save_links(class_name):
     shelve_file.close()
     text_file.close()
 
-# some change
+
 # Function that selects and maximizes the corresponding window.
 def selectw():
     a = 0
