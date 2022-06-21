@@ -30,7 +30,10 @@ def save_links(class_name):
 # Function that selects and maximizes the corresponding window.
 def select_window():
     a = 0
+
+    #TODO: for loop that iterates through all images in given directory, instead of hard coding the names
     try:
+
         location = pyautogui.locateCenterOnScreen(r'Images\plus.png')
         pyautogui.click(location.x + 15, location.y)
     except:
@@ -73,6 +76,7 @@ def get_links():
             links.append(pyperclip.paste())
             time.sleep(0.2)
             pyautogui.hotkey('ctrl', 'w')
+            # TODO: for loop that iterates through all images in given directory, instead of hard coding the names
             location = pyautogui.locateCenterOnScreen(r'Images\plus2.png')
             try:
                 pyautogui.moveTo(location.x / 2, location.y / 2)
@@ -92,13 +96,17 @@ def get_links():
     return links
 
 
-# Function that opens the links
 def open_links(class_name):
+    """Opens saved links in a new window.
+
+    :param class_name: The name of the group of links to open
+    :return:
+    """
+    if not valid_name(class_name):
+        sys.exit("Error: class name doesn't exist.")
+
     os.chdir(r'Save Links\Class Links\Shelve')
     shelve_retrieve = shelve.open('Links de Clases')
-    if class_name not in list(shelve_retrieve.keys()):
-        shelve_retrieve.close()
-        sys.exit("Error: class name doesn't exist.")
 
     webbrowser.open(shelve_retrieve[class_name][0], new=1)
     time.sleep(0.2)
@@ -106,6 +114,23 @@ def open_links(class_name):
     for x in range(1, len(shelve_retrieve[class_name])):
         webbrowser.open(shelve_retrieve[class_name][x])
     shelve_retrieve.close()
+
+
+def valid_name(link_group_name):
+    """Validates that data is saved under the specified name.
+
+    :param link_group_name: The name to check.
+    :return: True if name found, false if not found.
+    """
+    os.chdir(r'Save Links\Class Links\Shelve')
+    shelve_retrieve = shelve.open('Links de Clases')
+    exists = 0
+
+    if link_group_name in list(shelve_retrieve.keys()):
+        exists = 1
+
+    shelve_retrieve.close()
+    return exists
 
 
 # Function that appends the links
@@ -127,8 +152,38 @@ def append_links(class_name):
     text_file.close()
 
 
-def delete_links(class_name):
-    return 0
+def delete_links(link_group):
+    """Deletes the links saved under the specified name from the txt and shelve file.
+
+    :param link_group: The name of the group of links to delete.
+    :return:
+    """
+
+    if not valid_name(link_group):
+        sys.exit("Error: class name doesn't exist.")
+
+    if os.path.exists("Save Links\\Class Links\\Plain Text\\" + link_group + ".txt"):
+        os.remove("Save Links\\Class Links\\Plain Text\\" + link_group + ".txt")
+    else:
+        print("Error, txt file of specified group of links not found")
+
+    os.chdir(r'Save Links\Class Links\Shelve')
+
+    shelve_file = shelve.open('Links de Clases')
+
+    try:
+        links_deleted = shelve_file.pop(link_group)
+        print('Link group deleted successfully' + '\n')
+        print('Details of deleted links:', end='\n')
+        print('Name/key:', link_group, '\n')
+        print('Links erased:')
+
+        for link in links_deleted:
+            print(link)
+    except KeyError:
+        print("Error, Key not found")
+    finally:
+        shelve_file.close()
 
 
 def check_args(list):
@@ -163,7 +218,7 @@ def help_function():
     print('The arguments are received from the run dialog or the command line.\n')
     print("WARNING: If the terminal blocks the plus sign of the chrome window, the script won't work.")
     print('The format expected for the arguments is the following:')
-    print("name.py open/save/append/options/help/show/delete className", end='\n\n')
+    print("name.py open/save/append/options/help/show/delete link_group_name", end='\n\n')
     print('If there are more or less arguments, the program will throw an error.')
     # TODO: explain what each command does.
     print('The save method erases the previous stored links.', end="\n\n")
@@ -250,4 +305,3 @@ elif argument_list[1] == 'append':
     append_links(argument_list[2])
 elif argument_list[1] == 'delete':
     delete_links(argument_list[2])
-    
