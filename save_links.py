@@ -234,14 +234,13 @@ def show_options():
         print(key)
     shelve_file.close()
     print('\n')
-    return 0
 
 
 def show_detailed_options():
     os.chdir(r'Save Links\Class Links\Shelve')
     shelve_file = shelve.open('Links de Clases')
     for key in list(shelve_file.keys()):
-        print('Clase:', key)
+        print('Group Name:', key)
         for link in shelve_file[key]:
             print(link)
         print('\n')
@@ -258,7 +257,6 @@ def dramatic_close_message():
 
 def setup():
     """Creates the folders used by the program for the first time.
-
     """
     if not os.path.isdir('Save Links'):
         os.mkdir('Save Links')  # Folder that contains files used by the script.
