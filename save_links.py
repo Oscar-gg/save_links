@@ -13,25 +13,30 @@ import time
 import webbrowser
 
 
-# Function that saves the links of the open window.
-def save_links(class_name):
+def save_links(new_link_group):
+    """Saves links of the opened window. Closes all tabs via ctrl + w.
+    :param new_link_group: The name selected for the group of links.
+    :return:
+    """
     os.chdir(r'Save Links')
-    shelve_file = shelve.open(r'Class Links\Shelve\Links de Clases')
-    text_file = open('Class Links\\Plain Text\\' + class_name + '.txt', 'w')
+    shelve_file = shelve.open(r'Links\Shelve\links_shelve')
+    text_file = open('Links\\Plain Text\\' + new_link_group + '.txt', 'w')
     select_window()
     links = get_links()
-    shelve_file[class_name] = links
+    shelve_file[new_link_group] = links
     for link in links:
         text_file.write(link + "\n")
     shelve_file.close()
     text_file.close()
 
 
-# Function that selects and maximizes the corresponding window.
 def select_window():
+    """Selects and maximizes the corresponding window.
+    :return:
+    """
     a = 0
 
-    #TODO: for loop that iterates through all images in given directory, instead of hard coding the names
+    # TODO: for loop that iterates through all images in given directory, instead of hard coding the names
     try:
 
         location = pyautogui.locateCenterOnScreen(r'Images\plus.png')
@@ -58,14 +63,18 @@ def select_window():
         center_move()
 
 
-# Function that moves the mouse to the center of the screen.
 def center_move():
+    """Moves the cursor to the center of the screen.
+    :return:
+    """
     a, b = pyautogui.size()
     pyautogui.moveTo(a // 2, b // 2)
 
 
-# Function that collects the links.
 def get_links():
+    """Collects links using browser hotkeys.
+    :return:
+    """
     links = []
     try:
         for _ in range(20):
@@ -96,58 +105,61 @@ def get_links():
     return links
 
 
-def open_links(class_name):
+def open_links(link_group):
     """Opens saved links in a new window.
 
-    :param class_name: The name of the group of links to open
+    :param link_group: The name of the group of links to open.
     :return:
     """
-    if not valid_name(class_name):
-        sys.exit("Error: class name doesn't exist.")
+    if not valid_name(link_group):
+        sys.exit("Error: Group of links doesn't exist.")
 
-    os.chdir(r'Save Links\Class Links\Shelve')
-    shelve_retrieve = shelve.open('Links de Clases')
+    os.chdir(r'Save Links\Links\Shelve')
+    shelve_retrieve = shelve.open('links_shelve')
 
-    webbrowser.open(shelve_retrieve[class_name][0], new=1)
+    webbrowser.open(shelve_retrieve[link_group][0], new=1)
     time.sleep(0.2)
     pyautogui.hotkey('win', 'up')
-    for x in range(1, len(shelve_retrieve[class_name])):
-        webbrowser.open(shelve_retrieve[class_name][x])
+    for x in range(1, len(shelve_retrieve[link_group])):
+        webbrowser.open(shelve_retrieve[link_group][x])
     shelve_retrieve.close()
 
 
 def valid_name(link_group_name):
-    """Validates that data is saved under the specified name.
+    """Validates that there is data saved under the specified name.
 
     :param link_group_name: The name to check.
     :return: True if name found, false if not found.
     """
-    os.chdir(r'Save Links\Class Links\Shelve')
-    shelve_retrieve = shelve.open('Links de Clases')
+    shelve_retrieve = shelve.open(r'Save Links\Links\Shelve\links_shelve')
     exists = 0
 
-    if link_group_name in list(shelve_retrieve.keys()):
+    if link_group_name in shelve_retrieve.keys():
         exists = 1
 
     shelve_retrieve.close()
     return exists
 
 
-# Function that appends the links
-def append_links(class_name):
+def append_links(link_group):
+    """Appends links to previously saved file
+
+    :param link_group: The name of the group of links to append links to.
+    :return:
+    """
     os.chdir(r'Save Links')
-    shelve_file = shelve.open(r'Class Links\Shelve\Links de Clases')
-    if class_name not in list(shelve_file.keys()):
+    shelve_file = shelve.open(r'Links\Shelve\links_shelve')
+    if link_group not in shelve_file.keys():
         shelve_file.close()
         sys.exit("Error: class name doesn't exist.")
-    text_file = open('Class Links\\Plain Text\\' + class_name + '.txt', 'a')
-    temp_list = shelve_file[class_name]
+    text_file = open('Links\\Plain Text\\' + link_group + '.txt', 'a')
+    temp_list = shelve_file[link_group]
     select_window()
     to_append = get_links()
     for link in to_append:
         temp_list.append(link)
         text_file.write(link + "\n")
-    shelve_file[class_name] = temp_list
+    shelve_file[link_group] = temp_list
     shelve_file.close()
     text_file.close()
 
@@ -158,18 +170,17 @@ def delete_links(link_group):
     :param link_group: The name of the group of links to delete.
     :return:
     """
-
     if not valid_name(link_group):
         sys.exit("Error: class name doesn't exist.")
 
-    if os.path.exists("Save Links\\Class Links\\Plain Text\\" + link_group + ".txt"):
-        os.remove("Save Links\\Class Links\\Plain Text\\" + link_group + ".txt")
+    if os.path.exists("Save Links\\Links\\Plain Text\\" + link_group + ".txt"):
+        os.remove("Save Links\\Links\\Plain Text\\" + link_group + ".txt")
     else:
-        print("Error, txt file of specified group of links not found")
+        print("Error: txt file of specified group of links not found")
 
-    os.chdir(r'Save Links\Class Links\Shelve')
+    os.chdir(r'Save Links\Links\Shelve')
 
-    shelve_file = shelve.open('Links de Clases')
+    shelve_file = shelve.open('links_shelve')
 
     try:
         links_deleted = shelve_file.pop(link_group)
@@ -225,22 +236,24 @@ def help_function():
     return 1
 
 
-# Shows the available options to open or delete.
 def show_options():
-    os.chdir(r'Save Links\Class Links\Shelve')
-    shelve_file = shelve.open('Links de Clases')
+    """Shows the available options to open, delete, or append.
+    :return:
+    """
+    os.chdir(r'Save Links\Links\Shelve')
+    shelve_file = shelve.open('links_shelve')
     print('Available options:\n')
-    for key in list(shelve_file.keys()):
+    for key in shelve_file.keys():
         print(key)
     shelve_file.close()
     print('\n')
 
 
 def show_detailed_options():
-    os.chdir(r'Save Links\Class Links\Shelve')
-    shelve_file = shelve.open('Links de Clases')
-    for key in list(shelve_file.keys()):
-        print('Group Name:', key)
+    os.chdir(r'Save Links\Links\Shelve')
+    shelve_file = shelve.open('links_shelve')
+    for key in shelve_file.keys():
+        print('Name:', key)
         for link in shelve_file[key]:
             print(link)
         print('\n')
@@ -256,22 +269,33 @@ def dramatic_close_message():
 
 
 def setup():
-    """Creates the folders used by the program for the first time.
+    """Creates the folders used by the program for the first time. Gives messages related to setup.
     """
+    print('Your current working directory (where files are saved): ' + os.getcwd(), '\n')
+
     if not os.path.isdir('Save Links'):
         os.mkdir('Save Links')  # Folder that contains files used by the script.
     if not os.path.isdir('Save Links\\Images'):
         os.mkdir('Save Links\\Images')  # Folder to save images of plus signs.
-    if not os.path.isdir('Save Links\\Class Links'):
-        os.mkdir('Save Links\\Class Links')  # Contains the files with links.
-    if not os.path.isdir('Save Links\\Class Links\\Shelve'):
-        os.mkdir('Save Links\\Class Links\\Shelve')  # Shelve files with links.
-    if not os.path.isdir('Save Links\\Class Links\\Plain Text'):
-        os.mkdir('Save Links\\Class Links\\Plain Text')  # Plain files w/links.
+    if not os.path.isdir('Save Links\\Links'):
+        os.mkdir('Save Links\\Links')  # Contains the files with links.
+    if not os.path.isdir('Save Links\\Links\\Shelve'):
+        os.mkdir('Save Links\\Links\\Shelve')  # Shelve files with links.
+    if not os.path.isdir('Save Links\\Links\\Plain Text'):
+        os.mkdir('Save Links\\Links\\Plain Text')  # Plain files w/links.
+    if len(os.listdir(r'Save Links\Images')) == 0:
+        print('WARNING: Add images of the plus sign of your browser in ' + "Save Links\\Images. Else, the script "
+                                                                           "will not work.")
 
 
 # Main thread
 # Format: name.py open/save/append/options/help/show/delete className
+
+# Directory overview:
+# 'Save Links' > 'Images' > [Image files of plus symbol of selected browser(s)]
+# 'Save Links' > 'Links' > 'Shelve' > [Shelve Files with links]
+# 'Save Links' > 'Links' > 'Plain Text' > [Txt files with links]
+
 setup()
 
 argument_list = sys.argv
