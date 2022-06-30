@@ -18,9 +18,12 @@ def save_links(new_link_group):
     :param new_link_group: The name selected for the group of links.
     :return:
     """
-    os.chdir(r'Save Links')
-    shelve_file = shelve.open(r'Links\Shelve\links_shelve')
-    text_file = open('Links\\Plain Text\\' + new_link_group + '.txt', 'w')
+    shelve_file = shelve.open(SHELVE_FILE_PATH)
+    # text_file = open('Links\\Plain Text\\' + new_link_group + '.txt', 'w')
+    text_file = open(TXT_FILE_PATH + '\\' + new_link_group + '.txt', 'w')
+    if valid_name(new_link_group):
+        past_links(shelve_file, new_link_group)
+
     select_window()
     links = get_links()
     shelve_file[new_link_group] = links
@@ -28,6 +31,13 @@ def save_links(new_link_group):
         text_file.write(link + "\n")
     shelve_file.close()
     text_file.close()
+
+
+def past_links(shelve_file, link_group):
+    print("'" + link_group + "'" + " has been previously used to save links.")
+    print("The new links will be saved and the previous ones erased.")
+    print("Links erased: \n")
+    print_link_group(shelve_file, link_group)
 
 
 def select_window():
@@ -114,9 +124,7 @@ def open_links(link_group):
     if not valid_name(link_group):
         sys.exit("Error: Group of links doesn't exist.")
 
-    os.chdir(r'Save Links\Links\Shelve')
-    shelve_retrieve = shelve.open('links_shelve')
-
+    shelve_retrieve = shelve.open(SHELVE_FILE_PATH)
     webbrowser.open(shelve_retrieve[link_group][0], new=1)
     time.sleep(0.2)
     pyautogui.hotkey('win', 'up')
@@ -131,7 +139,7 @@ def valid_name(link_group_name):
     :param link_group_name: The name to check.
     :return: True if name found, false if not found.
     """
-    shelve_retrieve = shelve.open(r'Save Links\Links\Shelve\links_shelve')
+    shelve_retrieve = shelve.open(SHELVE_FILE_PATH)
     exists = 0
 
     if link_group_name in shelve_retrieve.keys():
@@ -147,12 +155,13 @@ def append_links(link_group):
     :param link_group: The name of the group of links to append links to.
     :return:
     """
-    os.chdir(r'Save Links')
-    shelve_file = shelve.open(r'Links\Shelve\links_shelve')
-    if link_group not in shelve_file.keys():
-        shelve_file.close()
-        sys.exit("Error: class name doesn't exist.")
-    text_file = open('Links\\Plain Text\\' + link_group + '.txt', 'a')
+
+    if not valid_name(link_group):
+        sys.exit("Error: Link group doesn't exist.")
+
+    shelve_file = shelve.open(SHELVE_FILE_PATH)
+    text_file = open(TXT_FILE_PATH + '\\' + link_group + '.txt', 'a')
+
     temp_list = shelve_file[link_group]
     select_window()
     to_append = get_links()
@@ -171,16 +180,14 @@ def delete_links(link_group):
     :return:
     """
     if not valid_name(link_group):
-        sys.exit("Error: class name doesn't exist.")
+        sys.exit("Error: Link group doesn't exist.")
 
-    if os.path.exists("Save Links\\Links\\Plain Text\\" + link_group + ".txt"):
-        os.remove("Save Links\\Links\\Plain Text\\" + link_group + ".txt")
+    if os.path.exists(TXT_FILE_PATH + "\\" + link_group + ".txt"):
+        os.remove(TXT_FILE_PATH + "\\" + link_group + ".txt")
     else:
         print("Error: txt file of specified group of links not found")
 
-    os.chdir(r'Save Links\Links\Shelve')
-
-    shelve_file = shelve.open('links_shelve')
+    shelve_file = shelve.open(SHELVE_FILE_PATH)
 
     try:
         links_deleted = shelve_file.pop(link_group)
@@ -233,15 +240,13 @@ def help_function():
     print('If there are more or less arguments, the program will throw an error.')
     # TODO: explain what each command does.
     print('The save method erases the previous stored links.', end="\n\n")
-    return 1
 
 
 def show_options():
     """Shows the available options to open, delete, or append.
     :return:
     """
-    os.chdir(r'Save Links\Links\Shelve')
-    shelve_file = shelve.open('links_shelve')
+    shelve_file = shelve.open(SHELVE_FILE_PATH)
     print('Available options:\n')
     for key in shelve_file.keys():
         print(key)
@@ -250,14 +255,17 @@ def show_options():
 
 
 def show_detailed_options():
-    os.chdir(r'Save Links\Links\Shelve')
-    shelve_file = shelve.open('links_shelve')
+    shelve_file = shelve.open(SHELVE_FILE_PATH)
     for key in shelve_file.keys():
-        print('Name:', key)
-        for link in shelve_file[key]:
-            print(link)
-        print('\n')
+        print_link_group(shelve_file, key)
     shelve_file.close()
+
+
+def print_link_group(shelve_file, link_group):
+    print('Name:', link_group)
+    for link in shelve_file[link_group]:
+        print(link)
+    print('\n')
 
 
 def dramatic_close_message():
@@ -289,16 +297,20 @@ def setup():
 
 
 # Main thread
-# Format: name.py open/save/append/options/help/show/delete className
+# Format: name.py open/save/append/options/help/show/delete link_group_name
 
 # Directory overview:
 # 'Save Links' > 'Images' > [Image files of plus symbol of selected browser(s)]
-# 'Save Links' > 'Links' > 'Shelve' > [Shelve Files with links]
+# 'Save Links' > 'Links' > 'Shelve' > [Shelve files with links]
 # 'Save Links' > 'Links' > 'Plain Text' > [Txt files with links]
 
 setup()
 
 argument_list = sys.argv
+
+SHELVE_FILE_PATH = r'Save Links\Links\Shelve\links_shelve'
+
+TXT_FILE_PATH = r'Save Links\Links\Plain Text'
 
 if len(argument_list) < 2:
     sys.exit('Invalid argument list.')
