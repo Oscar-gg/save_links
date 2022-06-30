@@ -19,10 +19,12 @@ def save_links(new_link_group):
     :return:
     """
     shelve_file = shelve.open(SHELVE_FILE_PATH)
-    # text_file = open('Links\\Plain Text\\' + new_link_group + '.txt', 'w')
     text_file = open(TXT_FILE_PATH + '\\' + new_link_group + '.txt', 'w')
+
+    end_message = 'Links saved successfully'
+
     if valid_name(new_link_group):
-        past_links(shelve_file, new_link_group)
+        end_message = past_links(shelve_file, new_link_group)
 
     select_window()
     links = get_links()
@@ -32,12 +34,16 @@ def save_links(new_link_group):
     shelve_file.close()
     text_file.close()
 
+    print(end_message)
+
 
 def past_links(shelve_file, link_group):
-    print("'" + link_group + "'" + " has been previously used to save links.")
-    print("The new links will be saved and the previous ones erased.")
-    print("Links erased: \n")
-    print_link_group(shelve_file, link_group)
+    message = "'" + link_group + "'" + " has been previously used to save links." + '\n'
+    message += "The new links will be saved and the previous ones erased." + '\n' * 2
+    message += "Links erased:" + '\n' * 2
+    message += link_group_to_str(shelve_file, link_group)
+
+    return message
 
 
 def select_window():
@@ -45,6 +51,8 @@ def select_window():
     :return:
     """
     a = 0
+
+    os.chdir('Save Links')
 
     # TODO: for loop that iterates through all images in given directory, instead of hard coding the names
     try:
@@ -72,6 +80,8 @@ def select_window():
         pyautogui.hotkey('ctrl', '1')
         center_move()
 
+    os.chdir('..')  # Returns to initial cwd
+
 
 def center_move():
     """Moves the cursor to the center of the screen.
@@ -86,6 +96,7 @@ def get_links():
     :return:
     """
     links = []
+    os.chdir('Save Links')
     try:
         for _ in range(20):
             a = 0
@@ -112,6 +123,8 @@ def get_links():
     except KeyboardInterrupt:
         print('KeyboardInterrupt')
         return links
+
+    os.chdir('..')  # Returns to initial cwd
     return links
 
 
@@ -257,15 +270,16 @@ def show_options():
 def show_detailed_options():
     shelve_file = shelve.open(SHELVE_FILE_PATH)
     for key in shelve_file.keys():
-        print_link_group(shelve_file, key)
+        print(link_group_to_str(shelve_file, key))
     shelve_file.close()
 
 
-def print_link_group(shelve_file, link_group):
-    print('Name:', link_group)
+def link_group_to_str(shelve_file, link_group):
+    string = 'Name: ' + link_group + '\n'
     for link in shelve_file[link_group]:
-        print(link)
-    print('\n')
+        string += link + "\n"
+    string += '\n'
+    return string
 
 
 def dramatic_close_message():
