@@ -1,7 +1,9 @@
 #! python3
 
-# Description: script that makes 2 main actions. First, it saves the links of the opened window in
-# shelve and text documents. Then the other action is opening the stored links when asked.
+# Description: script that makes 2 main actions: saves the links of the opened window in
+# shelve and text documents, and opens the stored links on the default browser.
+
+# Author: Oscar-gg
 
 # imports
 import os
@@ -38,6 +40,11 @@ def save_links(new_link_group):
 
 
 def past_links(shelve_file, link_group):
+    """Constructs message in case the reuses a link group name.
+    :param shelve_file: file containing all link group information
+    :param link_group: name of link group.
+    :return: String containing information of the overwritten link group.
+    """
     message = "'" + link_group + "'" + " has been previously used to save links." + '\n'
     message += "The new links will be saved and the previous ones erased." + '\n' * 2
     message += "Links erased:" + '\n' * 2
@@ -188,7 +195,6 @@ def append_links(link_group):
 
 def delete_links(link_group):
     """Deletes the links saved under the specified name from the txt and shelve file.
-
     :param link_group: The name of the group of links to delete.
     :return:
     """
@@ -239,8 +245,10 @@ def check_args(list):
     return 0
 
 
-# Help section that displays information related to keywords and general use.
 def help_function():
+    """Help section that displays information related to keywords and general use.
+    :return: None
+    """
     print('Program made by Oscar Arreola\n')
     print('The purpose of this program is to store the links of an opened window in order to'
           ' open them when indicated through the arguments.')
@@ -251,7 +259,6 @@ def help_function():
     print('The format expected for the arguments is the following:')
     print("name.py open/save/append/options/help/show/delete link_group_name", end='\n\n')
     print('If there are more or less arguments, the program will throw an error.')
-    # TODO: explain what each command does.
     print('The save method erases the previous stored links.', end="\n\n")
 
 
@@ -268,6 +275,9 @@ def show_options():
 
 
 def show_detailed_options():
+    """Shows the available options, each with its links stored.
+        :return:
+    """
     shelve_file = shelve.open(SHELVE_FILE_PATH)
     for key in shelve_file.keys():
         print(link_group_to_str(shelve_file, key))
@@ -275,6 +285,11 @@ def show_detailed_options():
 
 
 def link_group_to_str(shelve_file, link_group):
+    """Returns string with the links saved under a specific link group name.
+    :param shelve_file: file containing all link group information
+    :param link_group: name of link group.
+    :return: String containing individual links of a link group.
+    """
     string = 'Name: ' + link_group + '\n'
     for link in shelve_file[link_group]:
         string += link + "\n"
