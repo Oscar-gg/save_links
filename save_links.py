@@ -5,6 +5,10 @@
 
 # Author: Oscar-gg
 
+# TODO: correct grammar, make better docstrings
+# TODO: [github] upload code, record video using script, write set-up instructions & general information.
+# TODO: Debug more, handle special cases, improve catch messages.
+
 # imports
 import os
 import pyautogui
@@ -29,7 +33,7 @@ def save_links(new_link_group):
         end_message = past_links(shelve_file, new_link_group)
 
     select_window()
-    links = get_links()
+    links = get_links() # TODO: inspect why this function slows script.
     shelve_file[new_link_group] = links
     for link in links:
         text_file.write(link + "\n")
@@ -57,37 +61,38 @@ def select_window():
     """Selects and maximizes the corresponding window.
     :return:
     """
-    a = 0
 
-    os.chdir('Save Links')
+    update_image_paths()
 
-    # TODO: for loop that iterates through all images in given directory, instead of hard coding the names
+    if len(active_image_paths) == 0:
+        print('ERROR, no plus sign identified.')
+        return
+
     try:
-
-        location = pyautogui.locateCenterOnScreen(r'Images\plus.png')
+        location = pyautogui.locateCenterOnScreen(IMAGE_PREFIX + '\\' + active_image_paths[0])
         pyautogui.click(location.x + 15, location.y)
-    except:
-        try:
-            location = pyautogui.locateCenterOnScreen(r'Images\plus2.png')
-            pyautogui.click(location.x + 15, location.y)
-        except:
-            try:
-                location = pyautogui.locateCenterOnScreen(r'Images\plus3.png')
-                pyautogui.click(location.x + 15, location.y)
-            except:
-                try:
-                    location = pyautogui.locateCenterOnScreen(r'Images\plus4.png')
-                    pyautogui.click(location.x + 15, location.y)
-                except:
-                    print('ERROR, no plus sign identified.')
-                    a = 1
-    if a == 0:
-        time.sleep(.2)
-        pyautogui.hotkey('win', 'up')
-        pyautogui.hotkey('ctrl', '1')
-        center_move()
+    except FileNotFoundError:
+        print("Unexpected error at select_window() function.")
+        return
 
-    os.chdir('..')  # Returns to initial cwd
+    time.sleep(.2)
+    pyautogui.hotkey('win', 'up')
+    pyautogui.hotkey('ctrl', '1')
+    center_move()
+
+
+def update_image_paths():
+    """Searches for plus signs in the screen. Adds the corresponding names of the identified plus signs to a list.
+    :return: None, modifies global variable.
+    """
+    global active_image_paths
+
+    for image in os.listdir(IMAGE_PREFIX):
+        if image in active_image_paths:
+            continue
+        if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + image):
+            active_image_paths.append(image)
+            break
 
 
 def center_move():
@@ -103,35 +108,39 @@ def get_links():
     :return:
     """
     links = []
-    os.chdir('Save Links')
+
+    update_image_paths()
+
+    time.sleep(0.2)
+
+    for image in active_image_paths:
+        if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + image):
+            global active_plus_sign
+            active_plus_sign = image  # Once the window is selected, the active plus sign can be identified.
+
+    if not active_plus_sign:
+        print("Error, no active plus sign identified")
+        return
+
     try:
         for _ in range(20):
-            a = 0
+            a = 1
             pyautogui.hotkey('ctrl', 'l')
             time.sleep(0.2)
             pyautogui.hotkey('ctrl', 'c')
             links.append(pyperclip.paste())
             time.sleep(0.2)
             pyautogui.hotkey('ctrl', 'w')
-            # TODO: for loop that iterates through all images in given directory, instead of hard coding the names
-            location = pyautogui.locateCenterOnScreen(r'Images\plus2.png')
-            try:
-                pyautogui.moveTo(location.x / 2, location.y / 2)
-            except:
-                try:
-                    location = pyautogui.locateCenterOnScreen(r'Images\plus4.png')
-                    pyautogui.moveTo(location.x / 2, location.y / 2)
-                except:
-                    a = 1
-            center_move()
+            if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + active_plus_sign):
+                a = 0
+
             if a == 1:
                 break
-            center_move()
+
     except KeyboardInterrupt:
         print('KeyboardInterrupt')
         return links
 
-    os.chdir('..')  # Returns to initial cwd
     return links
 
 
@@ -223,24 +232,24 @@ def delete_links(link_group):
         shelve_file.close()
 
 
-def check_args(list):
+def check_args(arguments):
     """Function that checks if the arguments are correct.
 
-    :param list:list of arguments retrieved from command line.
+    :param arguments:list of arguments retrieved from command line.
     :return: status code interpreted by main thread.
     """
-    if list[1] == 'help':
+    if arguments[1] == 'help':
         return help_function()
-    if list[1] == 'options':
+    if arguments[1] == 'options':
         return 3
-    if list[1] == 'show':
+    if arguments[1] == 'show':
         return 5
-    if len(list) != 3:
-        print('Error:', str(len(list)), 'arguments introduced.')
+    if len(arguments) != 3:
+        print('Error:', str(len(arguments)), 'arguments introduced.')
         return 2
-    if list[1] != 'save' and list[1] != 'append' and list[1] != 'open' \
-            and list[1] != 'delete':
-        print('Error:', list[1], 'is not a valid argument.')
+    if arguments[1] != 'save' and arguments[1] != 'append' and arguments[1] != 'open' \
+            and arguments[1] != 'delete':
+        print('Error:', arguments[1], 'is not a valid argument.')
         return 4
     return 0
 
@@ -290,11 +299,14 @@ def link_group_to_str(shelve_file, link_group):
     :param link_group: name of link group.
     :return: String containing individual links of a link group.
     """
-    string = 'Name: ' + link_group + '\n'
-    for link in shelve_file[link_group]:
-        string += link + "\n"
-    string += '\n'
-    return string
+    try:
+        string = 'Name: ' + link_group + '\n'
+        for link in shelve_file[link_group]:
+            string += link + "\n"
+        string += '\n'
+        return string
+    except TypeError:
+        return "Link group to str: TypeError with link group " + link_group
 
 
 def dramatic_close_message():
@@ -337,9 +349,16 @@ setup()
 
 argument_list = sys.argv
 
+# Global Variables
 SHELVE_FILE_PATH = r'Save Links\Links\Shelve\links_shelve'
-
 TXT_FILE_PATH = r'Save Links\Links\Plain Text'
+IMAGE_PREFIX = r'Save Links\Images'
+
+# Usually, the plus sign has 2 tones: one when the window is active and one when its not.
+# To distinguish the inactive from the active, this variable is used.
+active_plus_sign = ''
+
+active_image_paths = []
 
 if len(argument_list) < 2:
     sys.exit('Invalid argument list.')
