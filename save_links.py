@@ -33,13 +33,9 @@ def save_links(new_link_group):
     if valid_name(new_link_group):
         end_message = past_links(shelve_file, new_link_group)
 
-    init_time = time.time()
     select_window()
-    exec_time(init_time, 'select_window')
 
-    init_time = time.time()
     links = get_links()
-    exec_time(init_time, 'get_links')
 
     shelve_file[new_link_group] = links
     for link in links:
@@ -122,17 +118,11 @@ def get_links():
     :return: Array containing tabs' links.
     """
 
-    # init_time = time.time()
-
     links = []
 
-    init_time = time.time()
     update_image_paths(region_func())
-    exec_time(init_time, 'get_links -> update_image_paths')
 
     time.sleep(sleep_time())
-
-    init_time = time.time()
 
     global active_plus_sign
 
@@ -141,13 +131,9 @@ def get_links():
             active_plus_sign = image  # Once the window is selected, the active plus sign can be identified.
             break
 
-    exec_time(init_time, 'get_links -> for loop active plus sign')
-
     if not active_plus_sign:
         print("Error, no active plus sign identified")
         return
-
-    init_time = time.time()
 
     try:
         for _ in range(20):
@@ -163,12 +149,9 @@ def get_links():
 
             if a == 1:
                 break
-
     except KeyboardInterrupt:
-        exec_time(init_time, 'get_links -> loop that collect links')
         return links
 
-    exec_time(init_time, 'get_links -> loop that collect links')
     return links
 
 
