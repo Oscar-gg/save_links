@@ -6,8 +6,7 @@
 # Author's github: Oscar-gg
 
 # TODO: correct grammar, make better docstrings
-# TODO: [github] upload code, record video using script, write set-up instructions & general information.
-# TODO: Debug more, handle special cases, improve catch messages.
+# TODO: [github] upload code, write set-up instructions & general information.
 
 # imports
 import os
