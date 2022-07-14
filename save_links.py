@@ -3,7 +3,7 @@
 # Description: script that makes 2 main actions: saves the links of the opened window in
 # shelve and text documents, and opens the stored links on the default browser.
 
-# Author: Oscar-gg
+# Author's github: Oscar-gg
 
 # TODO: correct grammar, make better docstrings
 # TODO: [github] upload code, record video using script, write set-up instructions & general information.
@@ -21,6 +21,7 @@ import webbrowser
 
 def save_links(new_link_group):
     """Saves links of the opened window. Closes all tabs via ctrl + w.
+
     :param new_link_group: The name selected for the group of links.
     :return:
     """
@@ -32,8 +33,14 @@ def save_links(new_link_group):
     if valid_name(new_link_group):
         end_message = past_links(shelve_file, new_link_group)
 
+    init_time = time.time()
     select_window()
-    links = get_links() # TODO: inspect why this function slows script.
+    exec_time(init_time, 'select_window')
+
+    init_time = time.time()
+    links = get_links()
+    exec_time(init_time, 'get_links')
+
     shelve_file[new_link_group] = links
     for link in links:
         text_file.write(link + "\n")
@@ -45,6 +52,7 @@ def save_links(new_link_group):
 
 def past_links(shelve_file, link_group):
     """Constructs message in case the reuses a link group name.
+
     :param shelve_file: file containing all link group information
     :param link_group: name of link group.
     :return: String containing information of the overwritten link group.
@@ -69,28 +77,33 @@ def select_window():
         return
 
     try:
-        location = pyautogui.locateCenterOnScreen(IMAGE_PREFIX + '\\' + active_image_paths[0])
+        location = pyautogui.locateCenterOnScreen(IMAGE_PREFIX + '\\' + active_image_paths[0], grayscale=True)
         pyautogui.click(location.x + 15, location.y)
     except FileNotFoundError:
         print("Unexpected error at select_window() function.")
         return
 
-    time.sleep(.2)
+    time.sleep(sleep_time())
     pyautogui.hotkey('win', 'up')
     pyautogui.hotkey('ctrl', '1')
     center_move()
 
 
-def update_image_paths():
+def update_image_paths(region=(0, 0) + pyautogui.size()):
     """Searches for plus signs in the screen. Adds the corresponding names of the identified plus signs to a list.
-    :return: None, modifies global variable.
+
+    :param region: the region of the screen to search the image. (left, top, width, height)
+    :return: None, updates global variable
     """
     global active_image_paths
+
+    # grayscale: reduces execution time, but also accuracy.
+    # region: reduces execution time and search area.
 
     for image in os.listdir(IMAGE_PREFIX):
         if image in active_image_paths:
             continue
-        if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + image):
+        if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + image, grayscale=True, region=region):
             active_image_paths.append(image)
             break
 
@@ -105,42 +118,57 @@ def center_move():
 
 def get_links():
     """Collects links using browser hotkeys.
-    :return:
+
+    :return: Array containing tabs' links.
     """
+
+    # init_time = time.time()
+
     links = []
 
-    update_image_paths()
+    init_time = time.time()
+    update_image_paths(region_func())
+    exec_time(init_time, 'get_links -> update_image_paths')
 
-    time.sleep(0.2)
+    time.sleep(sleep_time())
+
+    init_time = time.time()
+
+    global active_plus_sign
 
     for image in active_image_paths:
-        if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + image):
-            global active_plus_sign
+        if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + image, grayscale=True, region=region_func()):
             active_plus_sign = image  # Once the window is selected, the active plus sign can be identified.
+            break
+
+    exec_time(init_time, 'get_links -> for loop active plus sign')
 
     if not active_plus_sign:
         print("Error, no active plus sign identified")
         return
 
+    init_time = time.time()
+
     try:
         for _ in range(20):
             a = 1
             pyautogui.hotkey('ctrl', 'l')
-            time.sleep(0.2)
+            time.sleep(sleep_time())
             pyautogui.hotkey('ctrl', 'c')
             links.append(pyperclip.paste())
-            time.sleep(0.2)
+            time.sleep(sleep_time())
             pyautogui.hotkey('ctrl', 'w')
-            if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + active_plus_sign):
+            if pyautogui.locateOnScreen(IMAGE_PREFIX + '\\' + active_plus_sign, grayscale=True, region=region_func()):
                 a = 0
 
             if a == 1:
                 break
 
     except KeyboardInterrupt:
-        print('KeyboardInterrupt')
+        exec_time(init_time, 'get_links -> loop that collect links')
         return links
 
+    exec_time(init_time, 'get_links -> loop that collect links')
     return links
 
 
@@ -155,7 +183,7 @@ def open_links(link_group):
 
     shelve_retrieve = shelve.open(SHELVE_FILE_PATH)
     webbrowser.open(shelve_retrieve[link_group][0], new=1)
-    time.sleep(0.2)
+    time.sleep(sleep_time())
     pyautogui.hotkey('win', 'up')
     for x in range(1, len(shelve_retrieve[link_group])):
         webbrowser.open(shelve_retrieve[link_group][x])
@@ -204,6 +232,7 @@ def append_links(link_group):
 
 def delete_links(link_group):
     """Deletes the links saved under the specified name from the txt and shelve file.
+
     :param link_group: The name of the group of links to delete.
     :return:
     """
@@ -252,6 +281,16 @@ def check_args(arguments):
         print('Error:', arguments[1], 'is not a valid argument.')
         return 4
     return 0
+
+
+def exec_time(initial_time, function='function'):
+    """Prints the execution time of a function.
+
+    :param initial_time: The time in seconds since the epoch before function execution.
+    :param function: the name of the function, helps for debugging and tracking specific functions.
+    :return:
+    """
+    print('Execution time of', function + ':', time.time() - initial_time, 'seconds', '\n')
 
 
 def help_function():
@@ -335,6 +374,22 @@ def setup():
     if len(os.listdir(r'Save Links\Images')) == 0:
         print('WARNING: Add images of the plus sign of your browser in ' + "Save Links\\Images. Else, the script "
                                                                            "will not work.")
+
+
+def region_func():
+    """Returns the region to search the web browser icon in.
+    :return: 4 integer tuple of (left, top, width, height)
+    """
+    width, height = pyautogui.size()
+    return 0, 0, width, height/8
+
+
+def sleep_time():
+    """Used to modify the duration of most time.sleep() statements.
+
+    :return: 0.2
+    """
+    return 0.2
 
 
 # Main thread
