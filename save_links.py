@@ -1,12 +1,11 @@
 #! python3
 
-# Description: script that makes 2 main actions: saves the links of the opened window in
-# shelve and text documents, and opens the stored links on the default browser.
+# Description: script that performs 2 main actions: saves the tabs' links of an opened window in
+# shelve and text documents, and opens the stored links on the default browser, by controlling
+# the mouse and keyboard. The links are stored under specific names given by the user, which can
+# be inspected or deleted.
 
 # Author's github: Oscar-gg
-
-# TODO: correct grammar, make better docstrings
-# TODO: [github] upload code, write set-up instructions & general information.
 
 # imports
 import os
@@ -33,7 +32,6 @@ def save_links(new_link_group):
         end_message = past_links(shelve_file, new_link_group)
 
     select_window()
-
     links = get_links()
 
     shelve_file[new_link_group] = links
@@ -46,7 +44,7 @@ def save_links(new_link_group):
 
 
 def past_links(shelve_file, link_group):
-    """Constructs message in case the reuses a link group name.
+    """Constructs message in case a link group name is reused.
 
     :param shelve_file: file containing all link group information
     :param link_group: name of link group.
@@ -149,6 +147,7 @@ def get_links():
             if a == 1:
                 break
     except KeyboardInterrupt:
+        # Exception commonly triggered because of ctrl + c hotkey.
         return links
 
     return links
@@ -192,7 +191,6 @@ def append_links(link_group):
     """Appends links to previously saved file
 
     :param link_group: The name of the group of links to append links to.
-    :return:
     """
 
     if not valid_name(link_group):
@@ -216,7 +214,6 @@ def delete_links(link_group):
     """Deletes the links saved under the specified name from the txt and shelve file.
 
     :param link_group: The name of the group of links to delete.
-    :return:
     """
     if not valid_name(link_group):
         sys.exit("Error: Link group doesn't exist.")
@@ -244,25 +241,28 @@ def delete_links(link_group):
 
 
 def check_args(arguments):
-    """Function that checks if the arguments are correct.
+    """Function that checks if the arguments are valid. Displays general and help information.
 
     :param arguments:list of arguments retrieved from command line.
-    :return: status code interpreted by main thread.
+    :return: None
     """
     if arguments[1] == 'help':
-        return help_function()
+        help_function()
+        sys.exit("Program aborted, help info displayed.\n")
     if arguments[1] == 'options':
-        return 3
+        show_options()
+        sys.exit("Program aborted, options displayed.\n")
     if arguments[1] == 'show':
-        return 5
+        show_detailed_options()
+        sys.exit("Program aborted, detailed options displayed.\n")
     if len(arguments) != 3:
         print('Error:', str(len(arguments)), 'arguments introduced.')
-        return 2
+        sys.exit('Program aborted, incorrect amount of arguments.')
     if arguments[1] != 'save' and arguments[1] != 'append' and arguments[1] != 'open' \
             and arguments[1] != 'delete':
         print('Error:', arguments[1], 'is not a valid argument.')
-        return 4
-    return 0
+        dramatic_close_message()
+        sys.exit('\n\nProgram aborted.')
 
 
 def exec_time(initial_time, function='function'):
@@ -277,19 +277,21 @@ def exec_time(initial_time, function='function'):
 
 def help_function():
     """Help section that displays information related to keywords and general use.
-    :return: None
     """
     print('Program made by Oscar Arreola\n')
     print('The purpose of this program is to store the links of an opened window in order to'
           ' open them when indicated through the arguments.')
-    print('Only works for chrome and, in case you want to save the links of a window, it should be opened'
+    print('Only tested for chrome and, in case you want to save the links of a window, it should be opened'
           ' and visible.')
+    print('Only works with Windows OS, and the hotkeys of the browser (ctrl #, ctrl l, ctrl w, etc) '
+          'should be active')
     print('The arguments are received from the run dialog or the command line.\n')
     print("WARNING: If the terminal blocks the plus sign of the chrome window, the script won't work.")
     print('The format expected for the arguments is the following:')
     print("name.py open/save/append/options/help/show/delete link_group_name", end='\n\n')
     print('If there are more or less arguments, the program will throw an error.')
-    print('The save method erases the previous stored links.', end="\n\n")
+    print('The save method erases the previously stored links under the specific reused link group name.', end="\n\n")
+    print("For more information check the project's github at: [...]")
 
 
 def show_options():
@@ -316,6 +318,7 @@ def show_detailed_options():
 
 def link_group_to_str(shelve_file, link_group):
     """Returns string with the links saved under a specific link group name.
+
     :param shelve_file: file containing all link group information
     :param link_group: name of link group.
     :return: String containing individual links of a link group.
@@ -360,6 +363,7 @@ def setup():
 
 def region_func():
     """Returns the region to search the web browser icon in.
+
     :return: 4 integer tuple of (left, top, width, height)
     """
     width, height = pyautogui.size()
@@ -374,7 +378,7 @@ def sleep_time():
     return 0.2
 
 
-# Main thread
+# -Start of execution
 # Format: name.py open/save/append/options/help/show/delete link_group_name
 
 # Directory overview:
@@ -391,7 +395,7 @@ SHELVE_FILE_PATH = r'Save Links\Links\Shelve\links_shelve'
 TXT_FILE_PATH = r'Save Links\Links\Plain Text'
 IMAGE_PREFIX = r'Save Links\Images'
 
-# Usually, the plus sign has 2 tones: one when the window is active and one when its not.
+# Usually, the plus sign has 2 tones: one when the window is active and one when it's not.
 # To distinguish the inactive from the active, this variable is used.
 active_plus_sign = ''
 
@@ -400,21 +404,7 @@ active_image_paths = []
 if len(argument_list) < 2:
     sys.exit('Invalid argument list.')
 
-status = check_args(argument_list)
-
-if status == 1:
-    sys.exit("Program aborted, help info displayed.\n")
-elif status == 2:
-    sys.exit('Program aborted, incorrect amount of arguments.')
-elif status == 3:
-    show_options()
-    sys.exit("Program aborted, options displayed.\n")
-elif status == 5:
-    show_detailed_options()
-    sys.exit("Program aborted, detailed options displayed.\n")
-elif status == 4:
-    dramatic_close_message()
-    sys.exit('\n\nProgram aborted.')
+check_args(argument_list)
 
 if argument_list[1] == 'save':
     save_links(argument_list[2])
