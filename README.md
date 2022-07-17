@@ -18,7 +18,7 @@ The links are stored in shelve and txt files and can be opened in the default br
 7. The saved links, which were saved under a specific name, can be inspected, deleted or opened by the script.
 
 ## Installation
-Download / make a local copy of save_links.py.
+Download / make a local copy of `save_links.py`.
 
 Download the following dependencies:
 
