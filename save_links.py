@@ -358,7 +358,7 @@ def setup():
         os.mkdir('Save Links\\Links\\Plain Text')  # Plain files w/links.
     if len(os.listdir(r'Save Links\Images')) == 0:
         print('WARNING: Add images of the plus sign/identifier of your browser in ' + "Save Links\\Images.")
-        print("Else, the script will not work.")
+        sys.exit("Else, the script will not work.")
 
 
 def region_func():

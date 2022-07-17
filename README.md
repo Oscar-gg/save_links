@@ -1,4 +1,4 @@
-#save_links
+# save_links
 
 Save all your tabs' links under specified names and reopen them whenever you like (Currently, only for Windows OS).
 Interact with this script from the command line.
@@ -44,11 +44,25 @@ In addition, a faster way of running the script without typing the whole path is
 link_group_name`.
 
 ## Setup
-
+First, run the script without any arguments.
 
 ```cmd
-
+save_links
 ```
+This will create the following folders in the current working directory:
+```
+Directory overview:
+'Save Links' > 'Images' > [Image files of plus symbol/identifier of selected browser(s)]
+'Save Links' > 'Links' > 'Shelve' > [Shelve files with links]
+'Save Links' > 'Links' > 'Plain Text' > [Txt files with links]
+```
+Now, add images of the plus sing / browser identifier to `Save links/Images`.
+
+The images need to be of good quality (.png preferably) and the smaller they are the better. 
+
+In addition, 2 or more images may need to be added because the identifier may have 2 tones: one
+when the window is active and one when it's not. See `image_examples/` for examples.
+
 ## Use
 
 ## Project Glossary
