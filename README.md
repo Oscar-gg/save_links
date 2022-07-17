@@ -15,7 +15,7 @@ The links are stored in shelve and txt files which can also be opened using the 
 4. The tab is suppressed using ctrl + w.
 5. The 2 previous steps are repeated until the characteristic image isn't identified.
 6. The links stored in the array are saved in txt and shelve files.
-7. The saved links, which were saved under a specific name, can be inspected, deleted or opened.
+7. The saved links, which were saved under a specific name, can be inspected, deleted or opened by the script.
 
 ## Installation
 Download / make a local copy of save_links.py.
@@ -28,7 +28,7 @@ import pyautogui, pyperclip
 Now, the script can be executed from cmd using: 
 
 ```
-py C:<path_to_script>\save_links.py <save/delete/etc> link_group_name
+py C:<path_to_script>\save_links.py <keyword> link_group_name
 ```
 
 In addition, a faster way of running the script without typing the whole path is to:
@@ -39,8 +39,9 @@ In addition, a faster way of running the script without typing the whole path is
 @py C:/Users/your_user/your_folder/save_links.py %*
 @pause
 ```
-2. In environment variables, edit Path and add `C:\Users\your_user\your_folder`
-3. Now, the script can be executed from the run dialog (win + r) or cmd by only typing `save_links <save/delete/etc> 
+2. Name the file: `save_links.bat`.
+3. In environment variables, edit Path and add `C:\Users\your_user\your_folder`
+4. Now, the script can be executed from the run dialog (win + r) or cmd by only typing `save_links <keyword> 
 link_group_name`.
 
 ## Setup
@@ -63,10 +64,34 @@ The images need to be of good quality (.png preferably) and the smaller they are
 In addition, 2 or more images may need to be added because the identifier may have 2 tones: one
 when the window is active and one when it's not. See `image_examples/` for examples.
 
-## Use
+A method of obtaining the images (of good quality) is through the use of pyautogui's [screenshot function](https://pyautogui.readthedocs.io/en/latest/screenshot.html):
+```
+pyautogui.screenshot('filename.png', region=(left,top, width, height))`
+```
 
-## Project Glossary
+## Use
+`save_links` + `keywords (e.g: save, open, show)` + `link_group_name`
+
+### Keyword list
+`help`: Displays information related to keywords and general use.
+
+`save` + `link_group_name`: Saves links of the opened window in `link_group_name`. Closes all tabs via ctrl + w.
+
+`open` + `link_group_name`: Opens links saved in `link_group_name` in a new window.
+
+`append` + `link_group_name`: Appends links to `link_group_name`. Doesn't delete `link_group_name`'s past links unlike `save`.
+
+`delete` + `link_group_name`: Deletes links saved under `link_group_name`.
+
+`options`: displays all `link_group_name` previously saved that haven't been deleted. 
+
+`show`: displays all `link_group_name` available, each with its associated links.
 
 ## Future Enhancement
-
-
+* Improve installation and setup method
+* Make the script cross-platform
+  
+## Contributing
+I am (relatively) new to GitHub, Python, open source, and programming; this project most likely has 
+several relevant mistakes. If there is something relevant that I could 
+improve, please let me know as I want to keep learning; constructive feedback is appreciated :)
