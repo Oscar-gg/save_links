@@ -6,7 +6,7 @@ Interact with this script from the command line.
 
 ## Overview
 The script works by sending keystrokes to select and copy links, maximize windows, close tabs, etc. using 'pyautogui'.
-The links are stored in shelve and txt files which can also be opened using the script.
+The links are stored in shelve and txt files and can be opened in the default browser using the script.
 
 ## How it works
 1. The script locates the browser's window using a characteristic image (e.g. the plus sign to add tabs or the close button)
@@ -22,9 +22,9 @@ Download / make a local copy of save_links.py.
 
 Download the following dependencies:
 
-```python
-import pyautogui, pyperclip
-```
+* pyautogui 
+* pyperclip
+
 Now, the script can be executed from cmd using: 
 
 ```
