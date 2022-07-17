@@ -57,7 +57,7 @@ Directory overview:
 'Save Links' > 'Links' > 'Shelve' > [Shelve files with links]
 'Save Links' > 'Links' > 'Plain Text' > [Txt files with links]
 ```
-Now, add images of the plus sing / browser identifier to `Save links/Images`.
+Now, add images of the plus sign / browser identifier to `Save links/Images`.
 
 The images need to be of good quality (.png preferably) and the smaller they are the better. 
 
