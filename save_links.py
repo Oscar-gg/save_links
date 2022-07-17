@@ -5,7 +5,7 @@
 # the mouse and keyboard. The links are stored under specific names given by the user, which can
 # be inspected or deleted.
 
-# Author's github: Oscar-gg
+# Link manager by Oscar-gg [Github]
 
 # imports
 import os
@@ -278,7 +278,7 @@ def exec_time(initial_time, function='function'):
 def help_function():
     """Help section that displays information related to keywords and general use.
     """
-    print('Program made by Oscar Arreola\n')
+    print('Link manager by Oscar-gg\n')
     print('The purpose of this program is to store the links of an opened window in order to'
           ' open them when indicated through the arguments.')
     print('Only tested for chrome and, in case you want to save the links of a window, it should be opened'
@@ -357,8 +357,8 @@ def setup():
     if not os.path.isdir('Save Links\\Links\\Plain Text'):
         os.mkdir('Save Links\\Links\\Plain Text')  # Plain files w/links.
     if len(os.listdir(r'Save Links\Images')) == 0:
-        print('WARNING: Add images of the plus sign of your browser in ' + "Save Links\\Images. Else, the script "
-                                                                           "will not work.")
+        print('WARNING: Add images of the plus sign/identifier of your browser in ' + "Save Links\\Images.")
+        print("Else, the script will not work.")
 
 
 def region_func():
