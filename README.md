@@ -20,18 +20,20 @@ https://user-images.githubusercontent.com/77394565/180081834-2951134c-99a2-4a5b-
 7. The saved links, which were saved under a specific name, can be inspected, deleted or opened by the script.
 
 ## Installation
-Download / make a local copy of `save_links.py`.
+Download / make a local copy of `save_links.py`. (Select `save_links.py`, click `raw`, and finally save using 'ctrl + s')
 
 Download the following dependencies:
 
-* pyautogui 
+* pyautogui (e.g. `py -m pip install pyautogui`)
 * pyperclip
+* Pillow
 
-Now, the script can be executed from cmd using: 
+Now, the script can be executed from cmd using (however, the setup must be done to use the script correctly.): 
 
 ```
 py C:<path_to_script>\save_links.py <keyword> link_group_name
 ```
+
 https://user-images.githubusercontent.com/77394565/180082098-bd8a3e4a-70e2-47a7-94db-26af5244cdf4.mp4
 
 In addition, a faster way of running the script without typing the whole path is to:
