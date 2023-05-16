@@ -291,7 +291,7 @@ def help_function():
     print("name.py open/save/append/options/help/show/delete link_group_name", end='\n\n')
     print('If there are more or less arguments, the program will throw an error.')
     print('The save method erases the previously stored links under the specific reused link group name.', end="\n\n")
-    print("For more information check the project's github at: [...]")
+    print("For more information check the project's github at: https://github.com/Oscar-gg/save_links")
 
 
 def show_options():
@@ -367,7 +367,7 @@ def region_func():
     :return: 4 integer tuple of (left, top, width, height)
     """
     width, height = pyautogui.size()
-    return 0, 0, width, height/8
+    return 0, 0, int(width), int(height/8)
 
 
 def sleep_time():
